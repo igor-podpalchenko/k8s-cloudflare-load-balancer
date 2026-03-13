@@ -103,6 +103,25 @@ helm upgrade --install cf-lb-controller ./charts/cf-lb-controller \
 
 CRDs are bundled in `charts/cf-lb-controller/crds` and are installed automatically by Helm.
 
+## Deploy From OCI
+
+Published OCI chart:
+
+- `oci://ghcr.io/igor-podpalchenko/charts/cf-lb-controller`
+
+Install from GHCR:
+
+```bash
+helm upgrade --install cf-lb-controller oci://ghcr.io/igor-podpalchenko/charts/cf-lb-controller \
+  --version 0.1.0 \
+  -n kube-system --create-namespace \
+  -f charts/cf-lb-controller/values.private.yaml
+```
+
+If you want to inspect the packaged chart stored in this repo, it is written under:
+
+- `charts/k8s-cloudflare-load-balancer/`
+
 ## Build artifacts
 
 All local build artifacts are written to `bin/`.

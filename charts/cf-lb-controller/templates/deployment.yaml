@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cf-lb-controller.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "cf-lb-controller.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    cf-lb-component: controller
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "cf-lb-controller.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "cf-lb-controller.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        cf-lb-component: controller
+    spec:
+      serviceAccountName: {{ include "cf-lb-controller.serviceAccountName" . }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: {{ include "cf-lb-controller.name" . }}
+                  app.kubernetes.io/instance: {{ .Release.Name }}
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: manager
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --leader-elect={{ ternary "true" "false" .Values.leaderElection }}
+          envFrom:
+            - configMapRef:
+                name: cf-lb-config
+          ports:
+            - name: healthz
+              containerPort: 8081
+              protocol: TCP
+{{- if eq (include "cf-lb-controller.webhookEnabled" .) "true" }}
+            - name: webhook
+              containerPort: {{ .Values.webhook.port }}
+              protocol: TCP
+{{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: healthz
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: healthz
+            initialDelaySeconds: 5
+            periodSeconds: 10
+{{- if eq (include "cf-lb-controller.webhookEnabled" .) "true" }}
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /tmp/k8s-webhook-server/serving-certs
+              readOnly: true
+{{- end }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+{{- if eq (include "cf-lb-controller.webhookEnabled" .) "true" }}
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: {{ include "cf-lb-controller.fullname" . }}-webhook-certs
+{{- end }}

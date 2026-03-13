@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cf-lb-controller
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cf-lb-controller
+rules:
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create", "get"]
+  - apiGroups: [""]
+    resources: ["services/status"]
+    verbs: ["get", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["daemonsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["gatewayclasses", "gateways", "httproutes", "tcproutes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: ["tcp-lb.l3.nu"]
+    resources: ["cloudflareservicestatuses", "vrrpstatuses", "cloudflareconnectors", "cloudflarednsrecords", "vrrppods"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cf-lb-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cf-lb-controller
+subjects:
+  - kind: ServiceAccount
+    name: cf-lb-controller
+    namespace: kube-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cf-lb-config
+  namespace: kube-system
+data:
+  CF_API_TOKEN: "REPLACE_ME"
+  CF_ACCOUNT_ID: "REPLACE_ME"
+  PRIMARY_DOMAIN: "example.com"
+  LB_CLASS: "tcp-lb.l3.nu/cloudflared"
+  ALLOW_CLASSLESS_LB: "true"
+  TUNNEL_REPLICAS: "2"
+  CLOUDFLARED_IMAGE: "cloudflare/cloudflared:latest"
+  VIP_ADDRESS: "10.83.0.250"
+  VIP_CIDR: "10.83.0.250/16"
+  VIP_INTERFACE: "eth0"
+  VIP_ROUTER_ID: "51"
+  VIP_AUTH_PASS: "CHANGE_ME"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cf-lb-controller
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: cf-lb-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cf-lb-controller
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cf-lb-controller
+    spec:
+      serviceAccountName: cf-lb-controller
+      containers:
+        - name: manager
+          image: ghcr.io/igor-podpalchenko/cf-lb-controller:latest
+          imagePullPolicy: Always
+          args:
+            - --leader-elect=true
+          envFrom:
+            - configMapRef:
+                name: cf-lb-config
+          ports:
+            - name: healthz
+              containerPort: 8081
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: healthz
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: healthz
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

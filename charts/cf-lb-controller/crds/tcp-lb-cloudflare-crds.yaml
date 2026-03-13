@@ -1,0 +1,274 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: cloudflareservicestatuses.tcp-lb.l3.nu
+spec:
+  group: tcp-lb.l3.nu
+  scope: Namespaced
+  names:
+    plural: cloudflareservicestatuses
+    singular: cloudflareservicestatus
+    kind: CloudflareServiceStatus
+    shortNames: ["cfss"]
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Service
+          type: string
+          jsonPath: .status.service.name
+        - name: Hostname
+          type: string
+          jsonPath: .status.dnsRecords[0].name
+        - name: TunnelID
+          type: string
+          jsonPath: .status.tunnel.id
+        - name: Connectors
+          type: integer
+          jsonPath: .status.tunnel.connectorCount
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: vrrpstatuses.tcp-lb.l3.nu
+spec:
+  group: tcp-lb.l3.nu
+  scope: Namespaced
+  names:
+    plural: vrrpstatuses
+    singular: vrrpstatus
+    kind: VRRPStatus
+    shortNames: ["vrrps"]
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: VIP
+          type: string
+          jsonPath: .status.vipAddress
+        - name: CIDR
+          type: string
+          jsonPath: .status.vipCIDR
+        - name: ProxyPort
+          type: string
+          jsonPath: .status.proxyPort
+        - name: OwnerPod
+          type: string
+          jsonPath: .status.vipOwnerPod
+        - name: OwnerNode
+          type: string
+          jsonPath: .status.vipOwnerNode
+        - name: OwnerIF
+          type: string
+          jsonPath: .status.vipOwnerInterface
+        - name: OwnerRX
+          type: string
+          jsonPath: .status.vipOwnerRXBytes
+        - name: OwnerTX
+          type: string
+          jsonPath: .status.vipOwnerTXBytes
+        - name: Pods
+          type: integer
+          jsonPath: .status.podCount
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: cloudflareconnectors.tcp-lb.l3.nu
+spec:
+  group: tcp-lb.l3.nu
+  scope: Namespaced
+  names:
+    plural: cloudflareconnectors
+    singular: cloudflareconnector
+    kind: CloudflareConnector
+    shortNames: ["cfcon"]
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Service
+          type: string
+          jsonPath: .spec.serviceRef.name
+        - name: TunnelID
+          type: string
+          jsonPath: .spec.tunnelRef.id
+        - name: Pod
+          type: string
+          jsonPath: .status.podName
+        - name: Node
+          type: string
+          jsonPath: .status.nodeName
+        - name: HostIP
+          type: string
+          jsonPath: .status.hostIP
+        - name: Ready
+          type: boolean
+          jsonPath: .status.ready
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Restarts
+          type: integer
+          jsonPath: .status.restarts
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: cloudflarednsrecords.tcp-lb.l3.nu
+spec:
+  group: tcp-lb.l3.nu
+  scope: Namespaced
+  names:
+    plural: cloudflarednsrecords
+    singular: cloudflarednsrecord
+    kind: CloudflareDNSRecord
+    shortNames: ["cfdns"]
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Service
+          type: string
+          jsonPath: .spec.serviceRef.name
+        - name: Name
+          type: string
+          jsonPath: .status.record.name
+        - name: ID
+          type: string
+          jsonPath: .status.record.id
+        - name: Type
+          type: string
+          jsonPath: .status.record.type
+        - name: Content
+          type: string
+          jsonPath: .status.record.content
+        - name: Proxied
+          type: boolean
+          jsonPath: .status.record.proxied
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: vrrppods.tcp-lb.l3.nu
+spec:
+  group: tcp-lb.l3.nu
+  scope: Namespaced
+  names:
+    plural: vrrppods
+    singular: vrrppod
+    kind: VRRPPod
+    shortNames: ["vpod"]
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Node
+          type: string
+          jsonPath: .status.nodeName
+        - name: HostIP
+          type: string
+          jsonPath: .status.hostIP
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: HAProxyReady
+          type: boolean
+          jsonPath: .status.haproxy.ready
+        - name: KeepalivedReady
+          type: boolean
+          jsonPath: .status.keepalived.ready
+        - name: HAProxyRestarts
+          type: integer
+          jsonPath: .status.haproxy.restarts
+        - name: KeepalivedRestarts
+          type: integer
+          jsonPath: .status.keepalived.restarts
+        - name: VIPAssigned
+          type: boolean
+          jsonPath: .status.vipAssigned
+        - name: VIPIF
+          type: string
+          jsonPath: .status.vipInterface
+        - name: RXBytes
+          type: string
+          jsonPath: .status.vipRXBytes
+        - name: TXBytes
+          type: string
+          jsonPath: .status.vipTXBytes
+        - name: VIP
+          type: string
+          jsonPath: .status.vipAddress
+        - name: ProxyPort
+          type: string
+          jsonPath: .status.proxyPort
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true

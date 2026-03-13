@@ -1,0 +1,21 @@
+{{- if eq (include "cf-lb-controller.webhookEnabled" .) "true" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cf-lb-controller.fullname" . }}-webhook
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "cf-lb-controller.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    cf-lb-component: webhook
+    cf-lb-enabled: {{ default "true" (index .Values.webhook.labels "cf-lb-enabled") | quote }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ include "cf-lb-controller.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - name: https
+      port: 443
+      targetPort: webhook
+      protocol: TCP
+{{- end }}

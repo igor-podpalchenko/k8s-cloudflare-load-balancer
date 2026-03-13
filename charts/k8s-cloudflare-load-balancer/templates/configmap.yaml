@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cf-lb-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    cf-lb-component: controller-config
+data:
+  CF_API_TOKEN: {{ .Values.config.cfApiToken | quote }}
+  CF_ACCOUNT_ID: {{ .Values.config.cfAccountId | quote }}
+  PRIMARY_DOMAIN: {{ .Values.config.primaryDomain | quote }}
+  LB_CLASS: {{ .Values.config.lbClass | quote }}
+  ALLOW_CLASSLESS_LB: {{ ternary "true" "false" .Values.config.allowClasslessLb | quote }}
+  TUNNEL_REPLICAS: {{ .Values.config.tunnelReplicas | quote }}
+  CLOUDFLARED_IMAGE: {{ .Values.config.cloudflaredImage | quote }}
+  VIP_ADDRESS: {{ .Values.config.vipAddress | quote }}
+  VIP_CIDR: {{ .Values.config.vipCidr | quote }}
+  VIP_INTERFACE: {{ .Values.config.vipInterface | quote }}
+  VIP_ROUTER_ID: {{ .Values.config.vipRouterId | quote }}
+  VIP_AUTH_PASS: {{ .Values.config.vipAuthPass | quote }}
+  ENABLE_MUTATING_WEBHOOK: {{ include "cf-lb-controller.webhookEnabled" . | quote }}
+  WEBHOOK_PORT: {{ .Values.webhook.port | quote }}

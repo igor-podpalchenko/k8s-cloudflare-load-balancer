@@ -26,7 +26,7 @@ go.work.sum
 
 # env file
 .env
-charts/cf-lb-controller/values.private.yaml
+charts/k8s-cloudflare-load-balancer/values.private.yaml
 bin/*
 !bin/.gitkeep
 controller

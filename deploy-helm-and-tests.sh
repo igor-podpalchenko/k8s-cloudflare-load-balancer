@@ -1,8 +1,8 @@
 #!/bin/bash
 
-helm upgrade --install cf-lb-controller ./charts/cf-lb-controller \
+helm upgrade --install cf-lb-controller ./charts/k8s-cloudflare-load-balancer \
   -n kube-system \
-  -f ./charts/cf-lb-controller/values.private.yaml \
+  -f ./charts/k8s-cloudflare-load-balancer/values.private.yaml \
   --wait --timeout 10m
 
 tests/deploy-nginx-lb-no-class.sh

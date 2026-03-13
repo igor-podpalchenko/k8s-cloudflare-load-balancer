@@ -81,41 +81,41 @@ To solve this, this project now supports a mutating admission webhook that defau
 
 ```bash
 # file is provided and gitignored:
-ls charts/cf-lb-controller/values.private.yaml
+ls charts/k8s-cloudflare-load-balancer/values.private.yaml
 ```
 
-2. Set real secrets in `charts/cf-lb-controller/values.private.yaml`:
+2. Set real secrets in `charts/k8s-cloudflare-load-balancer/values.private.yaml`:
 
 - `config.cfApiToken`
 - `config.cfAccountId`
 - `config.vipAuthPass`
 
-Do not commit `charts/cf-lb-controller/values.private.yaml`. It is intentionally gitignored.
+Do not commit `charts/k8s-cloudflare-load-balancer/values.private.yaml`. It is intentionally gitignored.
 
 3. Install from chart:
 
 ```bash
-helm upgrade --install cf-lb-controller ./charts/cf-lb-controller \
+helm upgrade --install cf-lb-controller ./charts/k8s-cloudflare-load-balancer \
   -n kube-system --create-namespace \
-  -f charts/cf-lb-controller/values.yaml \
-  -f charts/cf-lb-controller/values.private.yaml
+  -f charts/k8s-cloudflare-load-balancer/values.yaml \
+  -f charts/k8s-cloudflare-load-balancer/values.private.yaml
 ```
 
-CRDs are bundled in `charts/cf-lb-controller/crds` and are installed automatically by Helm.
+CRDs are bundled in `charts/k8s-cloudflare-load-balancer/crds` and are installed automatically by Helm.
 
 ## Deploy From OCI
 
 Published OCI chart:
 
-- `oci://ghcr.io/igor-podpalchenko/charts/cf-lb-controller`
+- `oci://ghcr.io/igor-podpalchenko/charts/k8s-cloudflare-load-balancer`
 
 Install from GHCR:
 
 ```bash
-helm upgrade --install cf-lb-controller oci://ghcr.io/igor-podpalchenko/charts/cf-lb-controller \
+helm upgrade --install cf-lb-controller oci://ghcr.io/igor-podpalchenko/charts/k8s-cloudflare-load-balancer \
   --version 0.1.0 \
   -n kube-system --create-namespace \
-  -f charts/cf-lb-controller/values.private.yaml
+  -f charts/k8s-cloudflare-load-balancer/values.private.yaml
 ```
 
 If you want to inspect the packaged chart stored in this repo, it is written under:
@@ -144,7 +144,7 @@ Output:
 
 Output package:
 
-- `bin/cf-lb-controller-<version>.tgz`
+- `bin/k8s-cloudflare-load-balancer-<version>.tgz`
 
 Quick test install (controllers + examples):
 
@@ -209,9 +209,9 @@ webhook:
 Example override:
 
 ```bash
-helm upgrade --install cf-lb-controller ./charts/cf-lb-controller \
+helm upgrade --install cf-lb-controller ./charts/k8s-cloudflare-load-balancer \
   -n kube-system --create-namespace \
-  -f charts/cf-lb-controller/values.private.yaml \
+  -f charts/k8s-cloudflare-load-balancer/values.private.yaml \
   --set webhook.labels.cf-lb-enabled=true \
   --set webhook.failurePolicy=Ignore
 ```
@@ -219,9 +219,9 @@ helm upgrade --install cf-lb-controller ./charts/cf-lb-controller \
 Disable webhook:
 
 ```bash
-helm upgrade --install cf-lb-controller ./charts/cf-lb-controller \
+helm upgrade --install cf-lb-controller ./charts/k8s-cloudflare-load-balancer \
   -n kube-system --create-namespace \
-  -f charts/cf-lb-controller/values.private.yaml \
+  -f charts/k8s-cloudflare-load-balancer/values.private.yaml \
   --set webhook.labels.cf-lb-enabled=false
 ```
 

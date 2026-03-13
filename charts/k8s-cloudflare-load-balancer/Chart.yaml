@@ -1,0 +1,6 @@
+apiVersion: v2
+name: k8s-cloudflare-load-balancer
+description: Cloudflare Tunnel + DNS LoadBalancer controller with Keepalived/HAProxy VIP status CRDs
+type: application
+version: 0.1.0
+appVersion: "latest"

@@ -1,0 +1,70 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/igor-podpalchenko/cf-lb-controller
+  tag: latest
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: ""
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+config:
+  # Required (Rancher "Edit as YAML" defaults)
+  cfApiToken: ""
+  cfAccountId: ""
+  primaryDomain: "l3.nu"
+  lbClass: "tcp-lb.l3.nu/cloudflared"
+
+  # Optional
+  allowClasslessLb: true
+  tunnelReplicas: 2
+  cloudflaredImage: "cloudflare/cloudflared:latest"
+  vipAddress: "10.83.0.250"
+  vipCidr: "10.83.0.250/16"
+  vipInterface: "eth0"
+  vipRouterId: "51"
+  vipAuthPass: "CHANGE_ME"
+
+leaderElection: true
+
+webhook:
+  labels:
+    cf-lb-enabled: "true"
+  port: 9443
+  failurePolicy: Ignore
+  webhooks:
+    - name: service-default-class.tcp-lb.l3.nu
+      admissionReviewVersions:
+        - v1
+      sideEffects: None
+      timeoutSeconds: 2
+      failurePolicy: Ignore
+      matchPolicy: Equivalent
+      reinvocationPolicy: Never
+      namespaceSelector: {}
+      objectSelector: {}
+      rules:
+        - apiGroups:
+            - ""
+          apiVersions:
+            - v1
+          operations:
+            - CREATE
+          resources:
+            - services
+          scope: "*"
+      clientConfig:
+        path: /mutate-v1-service
+        port: 443

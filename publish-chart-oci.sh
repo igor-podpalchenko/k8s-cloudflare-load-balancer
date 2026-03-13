@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CHART_DIR="${CHART_DIR:-$ROOT_DIR/charts/cf-lb-controller}"
+CHART_DIR="${CHART_DIR:-$ROOT_DIR/charts/k8s-cloudflare-load-balancer}"
 OCI_REPO="${OCI_REPO:-oci://ghcr.io/igor-podpalchenko/charts}"
-CHART_NAME="${CHART_NAME:-cf-lb-controller}"
+CHART_NAME="${CHART_NAME:-k8s-cloudflare-load-balancer}"
 CHART_VERSION="${CHART_VERSION:-}"
 OUT_DIR="${OUT_DIR:-$ROOT_DIR/bin}"
 
@@ -46,5 +46,5 @@ echo "  target:  $OCI_REPO"
 helm push "$PKG_FILE" "$OCI_REPO"
 
 echo
-echo "Published:"
+ echo "Published:"
 echo "  ${OCI_REPO#oci://}/$CHART_NAME:$CHART_VERSION"

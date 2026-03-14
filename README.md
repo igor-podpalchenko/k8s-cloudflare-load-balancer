@@ -1,5 +1,13 @@
 # k8s-cloudflare-load-balancer
 
+This k8s controller, that reduces your cloud (GKE, Azure, AWS, OVH) costs on Load balancer and public IP to zero.
+
+Please donate for new features development. It's intentionally left as "developer friendly" version with all features, but has no extras. If you need extra functionality with dashboard, advanced configuration, monitoring, logging and advanced security, please contact me for paid version: igor@podpalchenko.com
+
+Donate to (In UAH):
+
+https://send.monobank.ua/jar/3ZsxT3o6qB
+
 Kubernetes controller that implements a private `LoadBalancer` class using Cloudflare Tunnel + DNS.
 
 When a `Service` is created with:
@@ -66,14 +74,6 @@ For MinIO tests in this repo:
 
 - API is exposed via LB Service port `443` (to container `9000`)
 - Console is exposed via LB Service port `8443` (to container `9001`)
-
-## Why OVH LBs were being charged
-
-OVH creates an LB for any classless `Service` with `type=LoadBalancer`.
-
-`spec.loadBalancerClass` is immutable after create, so reconcile cannot safely "fix it later".
-
-To solve this, this project now supports a mutating admission webhook that defaults classless LB Services on `CREATE` to your configured class before OVH cloud-controller handles them.
 
 ## Deploy (Helm only)
 

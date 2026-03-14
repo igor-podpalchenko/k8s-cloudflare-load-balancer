@@ -6,7 +6,7 @@ Please donate for new features development. It's intentionally left as "develope
 
 Donate to (In UAH):
 
-https://send.monobank.ua/jar/3ZsxT3o6qB
+[![Donate via Monobank](https://img.shields.io/badge/Donate-Monobank-000000?style=for-the-badge)](https://send.monobank.ua/jar/3ZsxT3o6qB)
 
 Kubernetes controller that implements a private `LoadBalancer` class using Cloudflare Tunnel + DNS.
 
